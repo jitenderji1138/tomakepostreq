@@ -5,6 +5,12 @@ const credentials = require("./credential.json");
 admin.initializeApp({
     credential: admin.credential.cert(credentials)
 })
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', 'https://free-form.pages.dev');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  next();
+});
 app.set('view engine', 'ejs');
 app.set('views', __dirname);
 const db = admin.firestore();
