@@ -2,7 +2,6 @@ const express = require("express");
 const app = express();
 const admin = require("firebase-admin");
 const credentials = require("./credential.json");
-const path = require('path');
 admin.initializeApp({
     credential: admin.credential.cert(credentials)
 })
@@ -39,12 +38,32 @@ app.get('/', async (req, res) => {
 app.get('/Free-Netflix', async (req, res) => {
     try {
         const Netflix = db.collection("Free-Netflix");
+        const limit = parseInt(req.query.limit) || 20;
+        const page = parseInt(req.query.page) || 1;
+        const maincategory = req.query.MainCategory;
+        const geans = req.query.Geans;
         const response = await Netflix.get();
-        let responseArr = [];
-        response.forEach(doc => {
-            responseArr.push(doc.data());
+        let responseArr = response.docs.reverse().map(doc => doc.data());
+        const start = (page-1)*limit;
+        const end = limit*page;
+        if(maincategory){
+            responseArr = responseArr.filter(item => item.MainCategory === maincategory);
+        }
+        if(geans){
+            responseArr = responseArr.filter(item => item.Geans === geans);
+        }
+        responseArr = responseArr.slice(start, end);
+        res.send({
+            Owner:"jitenderji1137",
+            Linkedin:"https://www.linkedin.com/in/jitender1137/",
+            Instagram:"https://www.instagram.com/vijayji1137/",
+            Github:"https://github.com/jitenderji1137",
+            Email:"trademetrader1137@gmail.com",
+            Size:response._size,
+            Page:page,
+            Limit:limit,
+            "Free-Netflix": responseArr
         });
-        res.send(responseArr);
     } catch (error) {
         res.send(error);
     }
@@ -53,7 +72,13 @@ app.get('/Free-Netflix/:FileID', async(req, res)=>{
     try{
         const Netflix = db.collection("Free-Netflix").doc(req.params.FileID);
         const response = await Netflix.get();
-        res.send(response.data());
+        res.send({
+            Owner:"jitenderji1137",
+            Linkedin:"https://www.linkedin.com/in/jitender1137/",
+            Instagram:"https://www.instagram.com/vijayji1137/",
+            Github:"https://github.com/jitenderji1137",
+            Email:"trademetrader1137@gmail.com",
+            "Free-Netflix": response.data()});
     }
     catch(error){
         res.send(error);
